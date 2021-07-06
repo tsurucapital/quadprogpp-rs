@@ -1,0 +1,6 @@
+BasedOnStyle: Mozilla
+IndentWidth: 4
+Language: Cpp
+Standard: Auto
+ColumnLimit: 80
+UseCRLF: False
