@@ -1,0 +1,3 @@
+[submodule "quadprogpp-sys/upstream"]
+	path = quadprogpp-sys/upstream
+	url = https://github.com/liuq/QuadProgpp.git
