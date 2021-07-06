@@ -51,7 +51,7 @@ mod tests {
         let mut x = unsafe { new_vector(n) };
         let r = solve_quadprog(G.pin_mut(), g0.pin_mut(), &CE, &ce0, &CI, &ci0, x.pin_mut());
         assert_ulps_eq!(r, 12.0);
-        // assert_ulps_eq!(unsafe { vector_index(&x, 0) }, 1.0);
-        // assert_ulps_eq!(unsafe { vector_index(&x, 1) }, 2.0);
+        assert_ulps_eq!(unsafe { vector_index(&x, 0) }, 1.0);
+        assert_ulps_eq!(unsafe { vector_index(&x, 1) }, 2.0);
     }
 }
