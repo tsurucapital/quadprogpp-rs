@@ -1,3 +1,5 @@
+pub use cxx::Exception;
+
 pub use ffi::*;
 
 #[cxx::bridge(namespace = "quadprogpp")]
@@ -31,7 +33,7 @@ mod ffi {
             CI: &MatrixF64,
             ci0: &VectorF64,
             x: Pin<&mut VectorF64>,
-        ) -> f64;
+        ) -> Result<f64>;
     }
 }
 
@@ -57,7 +59,8 @@ mod tests {
         };
         let ci0 = unsafe { new_vector_from_ptr([0.0, 0.0, -2.0].as_ptr() as *const f64, p) };
         let mut x = unsafe { new_vector(n) };
-        let r = solve_quadprog(G.pin_mut(), g0.pin_mut(), &CE, &ce0, &CI, &ci0, x.pin_mut());
+        let r =
+            solve_quadprog(G.pin_mut(), g0.pin_mut(), &CE, &ce0, &CI, &ci0, x.pin_mut()).unwrap();
         assert_ulps_eq!(r, 12.0);
         assert_ulps_eq!(unsafe { vector_index(&x, 0) }, 1.0);
         assert_ulps_eq!(unsafe { vector_index(&x, 1) }, 2.0);
