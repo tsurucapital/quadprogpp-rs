@@ -5,12 +5,20 @@ mod ffi {
     unsafe extern "C++" {
         include!("quadprogpp-sys/include/wrapper.hpp");
 
+        /// A vector type whose element type is f64.
         type VectorF64;
+        /// Creates a new zero-filled [`VectorF64`] of length `n`.
         pub unsafe fn new_vector(n: u32) -> UniquePtr<VectorF64>;
+        /// Creates a new [`VectorF64`] from a pointer to the array and its length. Note that it
+        /// copies the data.
         pub unsafe fn new_vector_from_ptr(a: *const f64, n: u32) -> UniquePtr<VectorF64>;
+        /// Performs indexing operation on the vector.
         pub unsafe fn vector_index(v: &VectorF64, i: u32) -> f64;
 
+        /// A 2D matrix type whose element type is f64.
         type MatrixF64;
+        /// Creates a new n x m [`MatrixF64`] from a pointer to a row-major array and its shape.
+        /// Note that it copies the data.
         unsafe fn new_matrix_from_ptr(a: *const f64, n: u32, m: u32) -> UniquePtr<MatrixF64>;
     }
 
