@@ -60,7 +60,7 @@ where
 #[cfg(test)]
 mod tests {
     use approx::assert_ulps_eq;
-    use ndarray::{ArrayView1, ArrayView2};
+    use ndarray::{array, ArrayView1, ArrayView2};
 
     use super::*;
 
@@ -69,12 +69,12 @@ mod tests {
         let n = 2;
         let m = 1;
         let p = 3;
-        let g = ArrayView2::from_shape((n, n), &[4.0, -2.0, -2.0, 4.0]).unwrap();
-        let g0 = ArrayView1::from_shape(n, &[6.0, 0.0]).unwrap();
-        let ce = ArrayView2::from_shape((n, m), &[1.0, 1.0]).unwrap();
-        let ce0 = ArrayView1::from_shape(m, &[-3.0]).unwrap();
-        let ci = ArrayView2::from_shape((n, p), &[1.0, 0.0, 1.0, 0.0, 1.0, 1.0]).unwrap();
-        let ci0 = ArrayView1::from_shape(p, &[0.0, 0.0, -2.0]).unwrap();
+        let g = array![[4.0, -2.0], [-2.0, 4.0]];
+        let g0 = array![6.0, 0.0];
+        let ce = array![[1.0], [1.0]];
+        let ce0 = array![-3.0];
+        let ci = array![[1.0, 0.0, 1.0], [0.0, 1.0, 1.0]];
+        let ci0 = array![0.0, 0.0, -2.0];
         let (x, best) = solve((g, g0), Some((ce, ce0)), Some((ci, ci0)));
         assert_ulps_eq!(best, 12.0);
         assert_ulps_eq!(x[0], 1.0);
