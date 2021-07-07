@@ -16,27 +16,15 @@ where
     Sci: RawData<Elem = f64>,
     Sci0: RawData<Elem = f64>,
 {
-    let (n, m) = match *g.shape() {
-        [n, m] => (n, m),
-        _ => unreachable!(),
-    };
+    let (n, m) = g.dim();
     let mut g = unsafe { sys::new_matrix_from_ptr(g.as_ptr(), n as u32, m as u32) };
-    let n = match *g0.shape() {
-        [n] => n,
-        _ => unreachable!(),
-    };
+    let n = g0.dim();
     let mut g0 = unsafe { sys::new_vector_from_ptr(g0.as_ptr(), n as u32) };
     let (ce, ce0) = match ce {
         Some((ce, ce0)) => {
-            let (n, m) = match *ce.shape() {
-                [n, m] => (n, m),
-                _ => unreachable!(),
-            };
+            let (n, m) = ce.dim();
             let ce = unsafe { sys::new_matrix_from_ptr(ce.as_ptr(), n as u32, m as u32) };
-            let n = match *ce0.shape() {
-                [n] => n,
-                _ => unreachable!(),
-            };
+            let n = ce0.dim();
             let ce0 = unsafe { sys::new_vector_from_ptr(ce0.as_ptr(), n as u32) };
             (ce, ce0)
         }
@@ -48,15 +36,9 @@ where
     };
     let (ci, ci0) = match ci {
         Some((ci, ci0)) => {
-            let (n, m) = match *ci.shape() {
-                [n, m] => (n, m),
-                _ => unreachable!(),
-            };
+            let (n, m) = ci.dim();
             let ci = unsafe { sys::new_matrix_from_ptr(ci.as_ptr(), n as u32, m as u32) };
-            let n = match *ci0.shape() {
-                [n] => n,
-                _ => unreachable!(),
-            };
+            let n = ci0.dim();
             let ci0 = unsafe { sys::new_vector_from_ptr(ci0.as_ptr(), n as u32) };
             (ci, ci0)
         }
