@@ -110,36 +110,104 @@ where
 
 #[cfg(test)]
 mod tests {
-    use approx::assert_ulps_eq;
-    use ndarray::array;
+    use approx::{assert_abs_diff_eq, assert_ulps_eq};
+    use ndarray::{array, Array, Array2, ArrayView1, ArrayView2};
 
     use super::*;
 
     #[test]
     fn quadprogpp_demo() -> Result<()> {
-        // Given:
-        //   G =  4 -2
-        //       -2  4
-        //   g0 = 6
-        //        0
-        //
-        // Solve:
-        //   minimize f(x) = 1/2 x^T G x + g0 x
-        //   s.t.
-        //     x_1 + x_2 = 3
-        //     x_1 >= 0
-        //     x_1 + x_2 >= 2
-        //     x_2 >= 0
-        let g = array![[4.0, -2.0], [-2.0, 4.0]];
+        #[rustfmt::skip]
+        let g = array![
+            [4.0, -2.0],
+            [-2.0, 4.0],
+        ];
         let g0 = array![6.0, 0.0];
-        let ce = array![[1.0], [1.0]];
+        #[rustfmt::skip]
+        let ce = array![
+            [1.0],
+            [1.0],
+        ];
         let ce0 = array![-3.0];
-        let ci = array![[1.0, 1.0, 0.0], [0.0, 1.0, 1.0]];
+        #[rustfmt::skip]
+        let ci = array![
+            [1.0, 1.0, 0.0],
+            [0.0, 1.0, 1.0],
+        ];
         let ci0 = array![0.0, -2.0, 0.0];
         let (x, best) = solve((g, g0), Some((ce, ce0)), Some((ci, ci0)))?;
         assert_ulps_eq!(best, 12.0);
         assert_ulps_eq!(x[0], 1.0);
         assert_ulps_eq!(x[1], 2.0);
+        Ok(())
+    }
+
+    #[test]
+    fn eiquadprog_demo() {
+        let g = array![[2.1, 0.0, 1.0], [1.5, 2.2, 0.0], [1.2, 1.3, 3.1]];
+        let g0 = array![6.0, 1.0, 1.0];
+        let ce = array![[1.0], [2.0], [-1.0]];
+        let ce0 = array![-4.0];
+        #[rustfmt::skip]
+        let ci = array![
+            [1.0, 0.0, 0.0, -1.0],
+            [0.0, 1.0, 0.0, -1.0],
+            [0.0, 0.0, 1.0,  0.0]
+        ];
+        let ci0 = array![0.0, 0.0, 0.0, 10.0];
+        let (x, best) = solve((g, g0), Some((ce, ce0)), Some((ci, ci0))).unwrap();
+        assert_ulps_eq!(best, 6.4);
+        assert_ulps_eq!(x[0], 0.0);
+        assert_ulps_eq!(x[1], 2.0);
+        assert_ulps_eq!(x[2], 0.0);
+    }
+
+    // Problem 0 from hmatrix-quadpropp
+    #[test]
+    fn hmatrix_quadprogpp_problem0() -> Result<()> {
+        #[rustfmt::skip]
+        let g = array![
+            [4.0, 0.0],
+            [0.0, 2.0],
+        ];
+        let g0 = array![-4.0, -8.0];
+        let ce: Option<(ArrayView2<_>, ArrayView1<_>)> = None;
+        #[rustfmt::skip]
+        let ci = array![
+            [1.0, 0.0, -1.0],
+            [0.0, 1.0, -2.0],
+        ];
+        let ci0 = array![0.0, 0.0, 2.0];
+        let (answer, _) = solve((g, g0), ce, Some((ci, ci0)))?;
+        assert_abs_diff_eq!(answer[0], 2.0 / 9.0, epsilon = 1e-12);
+        assert_abs_diff_eq!(answer[1], 8.0 / 9.0, epsilon = 1e-12);
+        Ok(())
+    }
+
+    // Problem 1 from hmatrix-quadprogpp
+    #[test]
+    fn hmatrix_quadprogpp_problem1() -> Result<()> {
+        let offset: Array2<f64> = Array::eye(3) * 1e-12;
+        #[rustfmt::skip]
+        let g = array![
+            [      1.0, 2.0 / 3.0, 1.0 / 3.0],
+            [2.0 / 3.0, 2.0 / 3.0,       0.0],
+            [1.0 / 3.0,       0.0, 1.0 / 3.0],
+        ] + offset;
+        let g0 = array![-2.0, -4.0, 2.0];
+        let ce = array![[-3.0], [2.0], [1.0]];
+        let ce0 = array![0.0];
+        #[rustfmt::skip]
+        let ci = array![
+            [1.0,        0.0,        0.0],
+            [0.0,  1.0 / 3.0, -4.0 / 3.0],
+            [0.0, -1.0 / 3.0,  1.0 / 3.0]
+        ];
+        let ci0 = array![0.0, 0.0, 2.0];
+        let (answer, _) = solve((g, g0), Some((ce, ce0)), Some((ci, ci0)))?;
+        assert_ulps_eq!(answer[0], 2.0 / 9.0, epsilon = 1e-5);
+        assert_abs_diff_eq!(answer[1], 10.0 / 9.0, epsilon = 1e-5);
+        assert_abs_diff_eq!(answer[2], -14.0 / 9.0, epsilon = 1e-5);
         Ok(())
     }
 }
