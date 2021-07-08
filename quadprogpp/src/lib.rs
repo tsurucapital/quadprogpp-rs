@@ -86,7 +86,7 @@ where
             let ci = unsafe { sys::new_matrix_from_ptr(ci.as_ptr(), ci_n as u32, ci_m as u32) };
             let ci0_n = ci0.dim();
             assert_size!(ci0.dim(), ci0_n, ci_m);
-            let ci0 = unsafe { sys::new_vector(ci0_n as u32) };
+            let ci0 = unsafe { sys::new_vector_from_ptr(ci0.as_ptr(), ci0_n as u32) };
             (ci, ci0)
         }
         None => {
