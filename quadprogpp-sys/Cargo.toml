@@ -13,3 +13,6 @@ cxx-build = "1.0"
 
 [dev-dependencies]
 approx = "0.5.0"
+
+[features]
+trace-solver = []
