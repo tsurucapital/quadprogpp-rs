@@ -1,0 +1,66 @@
+on:
+  - push
+  - pull_request
+
+name: CI
+
+jobs:
+  ci:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        rust:
+          - stable
+          # - 1.50.0  # MSRV
+        os:
+          - ubuntu-20.04
+          - ubuntu-18.04
+          - macos-10.15
+          # - windows-2019
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: true
+
+      - uses: actions/cache@v2
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            target/
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-
+      - uses: actions-rs/toolchain@v1
+        name: Install toolchain
+        with:
+          profile: minimal
+          toolchain: ${{ matrix.rust }}
+          override: true
+          components: rustfmt, clippy
+
+      - uses: actions-rs/cargo@v1
+        name: Build
+        with:
+          command: build
+
+      - uses: actions-rs/cargo@v1
+        name: Test
+        with:
+          command: test
+
+      - uses: actions-rs/cargo@v1
+        name: Format
+        with:
+          command: fmt
+          args: -- --check
+
+      - uses: actions-rs/cargo@v1
+        name: Lint
+        with:
+          command: clippy
+          args: -- -D warnings
