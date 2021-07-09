@@ -155,7 +155,7 @@ where
             (ci, ci0)
         }
     };
-    let mut x = unsafe { sys::new_vector(g_n as u32) };
+    let mut x = sys::new_vector(g_n as u32);
     let best = sys::solve_quadprog(g.pin_mut(), g0.pin_mut(), &ce, &ce0, &ci, &ci0, x.pin_mut())?;
     if best.is_infinite() {
         return Err(Error::Infeasible);
