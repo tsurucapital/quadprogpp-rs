@@ -1,9 +1,13 @@
+//! Rust bindings to [`QuadProg++`](https://github.com/liuq/QuadProgpp) which is a library for
+//! Quadratic Programming implementing the [Goldfarb-Idnani active-set dual method](https://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.521.6352).
+
 use std::ptr;
 
 use ndarray::{ArrayBase, Ix1, Ix2, OwnedRepr, RawData};
 use quadprogpp_sys as sys;
 use thiserror::Error;
 
+/// The type returned by [`solve`].
 pub type Result<T> = std::result::Result<T, Error>;
 
 /// Errors that can happen in [`solve`]
@@ -96,6 +100,9 @@ macro_rules! assert_size {
     };
 }
 
+/// Solves a quadratic programming problem using the Goldfarb-Idnani active-set dual method.
+///
+/// `ce` is optional equality constraints and `ci` is optional inequality constraints.
 pub fn solve<G, G0, CE, CE0, CI, CI0>(
     g: ArrayBase<G, Ix2>,
     g0: ArrayBase<G0, Ix1>,
