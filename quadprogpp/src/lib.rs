@@ -17,14 +17,16 @@ pub enum Error {
     #[error("no feasible solution")]
     Infeasible,
     /// The given metrices and vectors have inconsistent dimentionalities.
-    #[error("size mismatch")]
+    #[error("size mismatch on {term} (expected: {expected:?}, found: {actual:?})")]
     SizeMismatch {
         term: &'static str,
         expected: usize,
         actual: usize,
     },
+    #[error("non-standard layout matrix on {term}")]
+    NonStandardLayout { term: &'static str },
     /// FFI error
-    #[error("{reason:?}")]
+    #[error("ffi error ({reason:?})")]
     Ffi { reason: String },
 }
 
@@ -100,6 +102,16 @@ macro_rules! assert_size {
     };
 }
 
+macro_rules! assert_data_layout {
+    ($term:expr) => {
+        if !$term.is_standard_layout() {
+            return Err(Error::NonStandardLayout {
+                term: stringify!($term),
+            });
+        }
+    };
+}
+
 /// Solves a quadratic programming problem using the Goldfarb-Idnani active-set dual method.
 ///
 /// `ce` is optional equality constraints and `ci` is optional inequality constraints.
@@ -125,6 +137,8 @@ where
     let mut g0 = unsafe { sys::new_vector_from_ptr(g0.as_ptr(), g0_n as u32) };
     let (ce, ce0) = match ce {
         Some(Constraints { coeffs, consts }) => {
+            assert_data_layout!(coeffs);
+            assert_data_layout!(consts);
             let (ce_n, ce_m) = coeffs.dim();
             assert_size!(ce.dim(), g_n, ce_n);
             let ce = unsafe { sys::new_matrix_from_ptr(coeffs.as_ptr(), ce_n as u32, ce_m as u32) };
@@ -141,6 +155,8 @@ where
     };
     let (ci, ci0) = match ci {
         Some(Constraints { coeffs, consts }) => {
+            assert_data_layout!(coeffs);
+            assert_data_layout!(consts);
             let (ci_n, ci_m) = coeffs.dim();
             assert_size!(ci.dim(), g_n, ci_n);
             let ci = unsafe { sys::new_matrix_from_ptr(coeffs.as_ptr(), ci_n as u32, ci_m as u32) };
