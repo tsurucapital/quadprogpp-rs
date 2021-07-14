@@ -255,7 +255,12 @@ mod tests {
 
     #[test]
     fn eiquadprog_demo() {
-        let g = array![[2.1, 0.0, 1.0], [1.5, 2.2, 0.0], [1.2, 1.3, 3.1]];
+        #[rustfmt::skip]
+        let g = array![
+            [2.1, 0.0, 1.0],
+            [1.5, 2.2, 0.0],
+            [1.2, 1.3, 3.1],
+        ];
         let g0 = array![6.0, 1.0, 1.0];
         let ce = array![[1.0], [2.0], [-1.0]];
         let ce0 = array![-4.0];
