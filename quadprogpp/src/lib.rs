@@ -114,7 +114,37 @@ macro_rules! assert_data_layout {
 
 /// Solves a quadratic programming problem using the Goldfarb-Idnani active-set dual method.
 ///
-/// `ce` is optional equality constraints and `ci` is optional inequality constraints.
+/// The problem is in the form:
+///
+/// $$
+/// \begin{align*}
+/// &\min_{x} \quad q(x) = \frac{1}{2} x^\intercal G x + g_0^\intercal x\\\\
+/// &\textrm{subject to} \\\\
+/// &\qquad\qquad
+/// \begin{aligned}
+/// CE^\intercal x + ce_0 &= 0 \\\\
+/// CI^\intercal x + ci_0 &\ge 0
+/// \end{aligned}
+/// \end{align*}
+/// $$
+/// where \\(CE\\) and \\(ce_0\\) are equality constraints, and \\(CI\\) and \\(ci_0\\) are
+/// inequality constraints. The shapes of the matrices and the vectors are:
+///
+/// * \\(G\\) is an \\(N \times N\\) matrix
+/// * \\(g_0\\) is an \\(N\\)-vector
+/// * \\(CE\\) is an \\(N \times P\\) matrix
+/// * \\(ce_0\\) is a \\(P\\)-vector
+/// * \\(CI\\) is an \\(N \times M\\) matrix
+/// * \\(ci_0\\) is an \\(M\\)-vector
+/// * \\(x\\) is an \\(N\\)-vector
+///
+/// Each matrix/vector is generic over the array representations.
+///
+/// # Errors
+///
+/// * If the problem doesn't have a feasible solution, this function returns [`Error::Infeasible`].
+/// * If the shapes of input matrices/vectors are wrong, it returns [`Error::SizeMismatch`].
+/// * If there's an error propagated from the underlying QuadProgpp library, it returns [`Error::Ffi`].
 pub fn solve<G, G0, CE, CE0, CI, CI0>(
     g: ArrayBase<G, Ix2>,
     g0: ArrayBase<G0, Ix1>,
