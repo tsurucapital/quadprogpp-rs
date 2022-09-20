@@ -1,5 +1,6 @@
 #pragma once
 
+#include <memory>
 #include "../upstream/src/Array.hh"
 #include "../upstream/src/QuadProg++.hh"
 
