@@ -9,7 +9,7 @@ repository = "https://github.com/tsurucapital/quadprogpp-rs"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-ndarray = "^0.15.3"
+ndarray = ">=0.15.3, <0.17.0"
 quadprogpp-sys = { version = "0.1", path = "../quadprogpp-sys" }
 thiserror = "1.0.26"
 
